@@ -1,0 +1,2398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ActionSA Mangaung Metro (Wards 1–51) | Master Operations System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            asaGreen: '#00874E',
+            asaGreenDark: '#006B3C',
+            asaGreenLight: '#E8F6EF',
+            asaBlack: '#000000',
+            asaCharcoal: '#141414',
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: #F6F8F7;
+      color: #000000;
+      overflow-x: hidden;
+    }
+    .table-scroll::-webkit-scrollbar {
+      height: 8px;
+      width: 8px;
+    }
+    .table-scroll::-webkit-scrollbar-thumb {
+      background: #00874E;
+      border-radius: 9999px;
+    }
+    .table-scroll::-webkit-scrollbar-track {
+      background: #E5E7EB;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <!-- Top Black & Green Brand Banner -->
+  <header class="bg-black text-white border-b-4 border-asaGreen sticky top-0 z-40 shadow-md">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+      <div class="flex flex-wrap items-center justify-between gap-3 py-3">
+        <!-- Brand Identity -->
+        <button
+          type="button"
+          onclick="navigateTo('index')"
+          class="flex items-center gap-3 text-left group focus:outline-none"
+          title="Return to Index & Dashboard"
+        >
+          <div class="bg-asaGreen text-white font-black px-3 py-1.5 rounded-lg text-sm sm:text-base tracking-tight border border-white/20 group-hover:bg-asaGreenDark transition">
+            ActionSA
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="font-extrabold text-sm sm:text-lg tracking-tight text-white">
+                MANGAUNG METRO (WARDS 1–51)
+              </span>
+              <span class="hidden md:inline-block text-[11px] font-bold uppercase tracking-wider bg-white/10 text-emerald-300 px-2 py-0.5 rounded-md border border-emerald-500/30">
+                Master Operations System
+              </span>
+            </div>
+            <p class="text-[11px] sm:text-xs text-gray-300">
+              Tsamaiso ya Dintlha ya Mangaung • Branch, Youth, Women's Committee &amp; Help Desk
+            </p>
+          </div>
+        </button>
+
+        <!-- Quick Action Controls -->
+        <div class="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onclick="exportCurrentViewCSV()"
+            class="px-3 py-2 rounded-lg text-xs font-bold bg-asaGreen hover:bg-asaGreenDark text-white border border-emerald-400/30 transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>⬇ Export CSV</span>
+          </button>
+          <button
+            type="button"
+            onclick="loadSampleData()"
+            class="px-3 py-2 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition cursor-pointer"
+          >
+            Sample Data
+          </button>
+          <button
+            type="button"
+            onclick="confirmClearAllData()"
+            class="px-3 py-2 rounded-lg text-xs font-semibold bg-black hover:bg-neutral-900 text-red-300 border border-red-500/40 transition cursor-pointer"
+          >
+            Reset All
+          </button>
+        </div>
+      </div>
+
+      <!-- Primary View Navigation Bar -->
+      <nav aria-label="Main Sections" class="flex items-center gap-1.5 overflow-x-auto pb-2.5 pt-1 text-xs sm:text-sm font-bold">
+        <button data-nav="index" onclick="navigateTo('index')" class="nav-pill px-3.5 py-2 rounded-lg whitespace-nowrap transition cursor-pointer">
+          Index &amp; Dashboard
+        </button>
+        <button data-nav="branch" onclick="navigateTo('branch')" class="nav-pill px-3.5 py-2 rounded-lg whitespace-nowrap transition cursor-pointer">
+          Branch Committee
+        </button>
+        <button data-nav="youth" onclick="navigateTo('youth')" class="nav-pill px-3.5 py-2 rounded-lg whitespace-nowrap transition cursor-pointer">
+          Youth League
+        </button>
+        <button data-nav="womens" onclick="navigateTo('womens')" class="nav-pill px-3.5 py-2 rounded-lg whitespace-nowrap transition cursor-pointer">
+          Women's Committee
+        </button>
+        <button data-nav="helpdesk" onclick="navigateTo('helpdesk')" class="nav-pill px-3.5 py-2 rounded-lg whitespace-nowrap transition cursor-pointer">
+          Help Desk (Ke Hloka Thuso)
+        </button>
+        <button data-nav="wards" onclick="navigateTo('wards')" class="nav-pill px-3.5 py-2 rounded-lg whitespace-nowrap transition cursor-pointer">
+          Ward 1–51 Matrix
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Toast / Status Banner (replaces alert/confirm) -->
+  <div id="feedbackBanner" class="max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 mt-3 hidden">
+    <div id="feedbackInner" class="rounded-xl px-4 py-3 text-xs sm:text-sm font-semibold flex items-center justify-between gap-3 border shadow-sm">
+      <span id="feedbackText"></span>
+      <button type="button" onclick="hideFeedback()" class="text-xs font-bold px-2 py-0.5 rounded bg-black/10 hover:bg-black/20 cursor-pointer">✕</button>
+    </div>
+  </div>
+
+  <!-- Confirmation Modal for Destructive Reset -->
+  <div id="confirmModal" class="fixed inset-0 z-50 bg-black/70 hidden items-center justify-center p-4">
+    <div class="bg-white border-2 border-black rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <div class="flex items-center gap-2 text-black font-black text-base uppercase tracking-wide mb-2">
+        <span class="inline-block w-3 h-3 rounded-full bg-asaGreen"></span>
+        Confirm System Reset / Netefatsa
+      </div>
+      <p class="text-sm text-gray-700 leading-relaxed mb-5">
+        Are you sure you want to clear all saved records across Branch, Youth, Women's Committee, and Help Desk in this browser? This cannot be undone.
+      </p>
+      <div class="flex items-center justify-end gap-3">
+        <button type="button" onclick="closeConfirmModal()" class="px-4 py-2 rounded-lg text-xs font-bold border border-gray-300 text-gray-800 hover:bg-gray-100 cursor-pointer">
+          Cancel / Hlakola
+        </button>
+        <button type="button" onclick="executeClearAllData()" class="px-4 py-2 rounded-lg text-xs font-bold bg-black text-white hover:bg-neutral-800 cursor-pointer">
+          Yes, Clear Records
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Dynamic Application Container -->
+  <main id="appContainer" class="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-6 space-y-6"></main>
+
+  <!-- Footer -->
+  <footer class="bg-black text-white border-t-4 border-asaGreen py-4 mt-10">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-300">
+      <div>
+        <strong class="text-white">ActionSA Mangaung Metro (Wards 1–51)</strong> — Master Operations System • Data stored locally in your browser (<code class="text-emerald-400">localStorage</code>)
+      </div>
+      <div class="text-emerald-300 font-semibold">
+        Bloemfontein • Botshabelo • Thaba Nchu • Free State
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /**
+     * =========================================================================
+     * ACTIONSA MANGAUNG METRO (WARDS 1–51) MASTER OPERATIONS SYSTEM
+     * State Management, SA ID Auto-Parser, Live Aggregations & UI Renderer
+     * =========================================================================
+     */
+
+    const STORAGE_KEY = 'actionsa_mangaung_w1_51_system_v1';
+
+    const WARDS = Array.from({ length: 51 }, (_, idx) => `Ward ${idx + 1}`);
+
+    const REGIONS = [
+      'Bloemfontein',
+      'Botshabelo',
+      'Thaba Nchu',
+      'Other / Rural'
+    ];
+
+    const BRANCH_ROLES = [
+      'Branch Chairperson',
+      'Branch Secretary',
+      'Branch Treasurer',
+      'Branch Organiser',
+      'Street / Section Coordinator',
+      'General Member'
+    ];
+
+    const YOUTH_ROLES = [
+      'Youth Chairperson',
+      'Youth Secretary',
+      'Youth Organiser',
+      'Skills & Education Lead',
+      'Sport & Culture Lead',
+      'Youth Member'
+    ];
+
+    const WOMENS_VOLUNTEER_OPTIONS = [
+      'Help Desk Support',
+      'Cleaning Campaign',
+      'GBV Support',
+      'Digital Skills Training',
+      'Facebook / WhatsApp Comms',
+      'Ithuta Feela Pele'
+    ];
+
+    const WOMENS_ID_STATUSES = [
+      'Eya - ke na le ID',
+      'Tjhe - ha ke na ID',
+      'Ke hloka thuso ka ID'
+    ];
+
+    const WOMENS_FOLLOWUP_STATUSES = [
+      'Pending Call',
+      'Called - Active',
+      'No Answer',
+      'Follow-up Needed'
+    ];
+
+    const MEMBER_STATUSES = ['Active', 'Pending Verification', 'Inactive'];
+    const IEC_STATUSES = ['Registered (IEC)', 'Not Registered', 'Needs Assistance'];
+
+    const HELP_DESK_CATEGORIES = [
+      'Metsi',
+      'Motlakase',
+      'SASSA / Grant',
+      'ID / Birth Certificate',
+      'GBV / Tlhekefetso',
+      'Mosebetsi / CV',
+      'E nngwe'
+    ];
+
+    const CALL_TIMES = [
+      'Hoseng (08:00 - 12:00)',
+      'Motsheare (12:00 - 15:00)',
+      'Thapama (15:00 - 18:00)'
+    ];
+
+    const CASE_STATUSES = [
+      'New / Pending',
+      'In Progress',
+      'Referred',
+      'Resolved'
+    ];
+
+    // Default region assignment across Wards 1-51 for Mangaung Metro
+    function getDefaultRegionForWard(wardNum) {
+      if (wardNum >= 25 && wardNum <= 41) return 'Botshabelo';
+      if (wardNum >= 42 && wardNum <= 46) return 'Thaba Nchu';
+      if (wardNum >= 47 && wardNum <= 51) return 'Other / Rural';
+      return 'Bloemfontein';
+    }
+
+    function createDefaultWardMetadata() {
+      const meta = {};
+      for (let w = 1; w <= 51; w++) {
+        meta[`Ward ${w}`] = {
+          region: getDefaultRegionForWard(w),
+          coordinator: ''
+        };
+      }
+      return meta;
+    }
+
+    function createSampleState() {
+      return {
+        currentView: 'index',
+        editing: {
+          branchId: null,
+          youthId: null,
+          womensId: null,
+          helpdeskId: null
+        },
+        filters: {
+          branchSearch: '',
+          branchWard: 'ALL',
+          branchStatus: 'ALL',
+          youthSearch: '',
+          youthWard: 'ALL',
+          youthStatus: 'ALL',
+          womensSearch: '',
+          womensWard: 'ALL',
+          womensFollowup: 'ALL',
+          helpdeskSearch: '',
+          helpdeskWard: 'ALL',
+          helpdeskCategory: 'ALL',
+          helpdeskStatus: 'ALL',
+          wardMatrixSearch: '',
+          wardMatrixRegion: 'ALL'
+        },
+        wardMeta: createDefaultWardMetadata(),
+        branch: [
+          {
+            id: 'BR-101',
+            fullName: 'Thabo Mokhele',
+            saId: '8804125124083',
+            phone: '073 412 8890',
+            ward: 'Ward 28',
+            region: 'Botshabelo',
+            address: 'Section K, House 142',
+            role: 'Branch Chairperson',
+            iecStatus: 'Registered (IEC)',
+            status: 'Active'
+          },
+          {
+            id: 'BR-102',
+            fullName: 'Naledi Mokoena',
+            saId: '9209180482081',
+            phone: '082 554 1192',
+            ward: 'Ward 18',
+            region: 'Bloemfontein',
+            address: 'Phase 4, Mangaung',
+            role: 'Branch Secretary',
+            iecStatus: 'Registered (IEC)',
+            status: 'Active'
+          }
+        ],
+        youth: [
+          {
+            id: 'YT-201',
+            fullName: 'Katleho Radebe',
+            saId: '0106225311085',
+            phone: '061 804 3321',
+            ward: 'Ward 28',
+            region: 'Botshabelo',
+            address: 'Section H, Street 4',
+            role: 'Youth Chairperson',
+            iecStatus: 'Registered (IEC)',
+            status: 'Active'
+          },
+          {
+            id: 'YT-202',
+            fullName: 'Palesa Tsotetsi',
+            saId: '0311050618082',
+            phone: '078 902 6645',
+            ward: 'Ward 43',
+            region: 'Thaba Nchu',
+            address: 'Selosesha Unit 2',
+            role: 'Skills & Education Lead',
+            iecStatus: 'Needs Assistance',
+            status: 'Pending Verification'
+          }
+        ],
+        womens: [
+          {
+            id: 'WM-301',
+            fullName: 'Mpho Moloi',
+            saId: '8503140712084',
+            phone: '060 315 3439',
+            ward: 'Ward 28',
+            region: 'Botshabelo',
+            address: 'Section K, near Clinic',
+            volunteerAreas: ['Help Desk Support', 'GBV Support', 'Digital Skills Training'],
+            idStatus: 'Eya - ke na le ID',
+            followupStatus: 'Called - Active'
+          },
+          {
+            id: 'WM-302',
+            fullName: 'Dimakatso Sebeko',
+            saId: '9407290521087',
+            phone: '083 719 2048',
+            ward: 'Ward 12',
+            region: 'Bloemfontein',
+            address: 'Bochabela Main Rd',
+            volunteerAreas: ['Cleaning Campaign', 'Facebook / WhatsApp Comms'],
+            idStatus: 'Ke hloka thuso ka ID',
+            followupStatus: 'Pending Call'
+          }
+        ],
+        helpdesk: [
+          {
+            id: 'HD-401',
+            caseNumber: 'MAN-0001',
+            dateLogged: '2026-11-20',
+            ward: 'Ward 28',
+            region: 'Botshabelo',
+            fullName: 'Selloane Mohapi',
+            category: 'Metsi',
+            phone: '072 641 9082',
+            address: 'Section K',
+            description: 'Ha re na metsi Section K matsatsi a 3; water tanker ha e fihle.',
+            callTime: 'Hoseng (08:00 - 12:00)',
+            status: 'In Progress',
+            assignedTo: 'Thabo Mokhele',
+            notes: 'Escalated to Mangaung Water Directorate.'
+          },
+          {
+            id: 'HD-402',
+            caseNumber: 'MAN-0002',
+            dateLogged: '2026-11-21',
+            ward: 'Ward 28',
+            region: 'Botshabelo',
+            fullName: 'Kelebogile Tladi',
+            category: 'SASSA / Grant',
+            phone: '064 221 7730',
+            address: 'Section M',
+            description: 'Child Support Grant payment delayed for two months.',
+            callTime: 'Motsheare (12:00 - 15:00)',
+            status: 'New / Pending',
+            assignedTo: 'Mpho Moloi',
+            notes: 'Awaiting morning call.'
+          },
+          {
+            id: 'HD-403',
+            caseNumber: 'MAN-0003',
+            dateLogged: '2026-11-22',
+            ward: 'Ward 43',
+            region: 'Thaba Nchu',
+            fullName: 'Boitumelo Nhlapo',
+            category: 'Motlakase',
+            phone: '079 510 4412',
+            address: 'Ratlou Village',
+            description: 'Prepaid meter token rejected after transformer maintenance.',
+            callTime: 'Thapama (15:00 - 18:00)',
+            status: 'Resolved',
+            assignedTo: 'Palesa Tsotetsi',
+            notes: 'Meter reset and token issued.'
+          }
+        ]
+      };
+    }
+
+    function createEmptyState() {
+      const sample = createSampleState();
+      return {
+        ...sample,
+        branch: [],
+        youth: [],
+        womens: [],
+        helpdesk: []
+      };
+    }
+
+    let appState = loadState();
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return createSampleState();
+        const parsed = JSON.parse(raw);
+        const fallback = createSampleState();
+        return {
+          ...fallback,
+          ...parsed,
+          editing: { ...fallback.editing, ...(parsed.editing || {}) },
+          filters: { ...fallback.filters, ...(parsed.filters || {}) },
+          wardMeta: { ...createDefaultWardMetadata(), ...(parsed.wardMeta || {}) },
+          branch: Array.isArray(parsed.branch) ? parsed.branch : [],
+          youth: Array.isArray(parsed.youth) ? parsed.youth : [],
+          womens: Array.isArray(parsed.womens) ? parsed.womens : [],
+          helpdesk: Array.isArray(parsed.helpdesk) ? parsed.helpdesk : []
+        };
+      } catch (err) {
+        console.error('Failed to load state from localStorage:', err);
+        return createSampleState();
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
+      } catch (err) {
+        console.error('Failed to save state to localStorage:', err);
+        showFeedback('Could not save to browser storage. Check storage quota.', 'error');
+      }
+    }
+
+    /**
+     * =========================================================================
+     * SOUTH AFRICAN 13-DIGIT ID AUTO-PARSER
+     * Computes Date of Birth (YYYY-MM-DD), Age in Years, and Gender
+     * =========================================================================
+     */
+    function parseSouthAfricanID(rawId) {
+      const clean = String(rawId || '').replace(/\D/g, '');
+      if (clean.length !== 13) {
+        return {
+          valid: false,
+          dob: '—',
+          age: '—',
+          gender: '—',
+          reason: clean.length === 0 ? 'Enter 13-digit SA ID' : `${clean.length}/13 digits`
+        };
+      }
+
+      const yy = parseInt(clean.slice(0, 2), 10);
+      const mm = parseInt(clean.slice(2, 4), 10);
+      const dd = parseInt(clean.slice(4, 6), 10);
+      const genderDigits = parseInt(clean.slice(6, 10), 10);
+
+      // Determine century relative to current year (2026)
+      const currentFullYear = new Date().getFullYear();
+      const currentTwoDigit = currentFullYear % 100;
+      const fullYear = yy <= currentTwoDigit + 1 ? 2000 + yy : 1900 + yy;
+
+      const testDate = new Date(fullYear, mm - 1, dd);
+      const isDateValid =
+        mm >= 1 &&
+        mm <= 12 &&
+        dd >= 1 &&
+        dd <= 31 &&
+        testDate.getFullYear() === fullYear &&
+        testDate.getMonth() === mm - 1 &&
+        testDate.getDate() === dd;
+
+      if (!isDateValid) {
+        return {
+          valid: false,
+          dob: 'Invalid Date',
+          age: '—',
+          gender: '—',
+          reason: 'Invalid birth date in ID'
+        };
+      }
+
+      const today = new Date();
+      let age = today.getFullYear() - fullYear;
+      const monthDiff = today.getMonth() - (mm - 1);
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dd)) {
+        age -= 1;
+      }
+
+      const gender = genderDigits >= 5000 ? 'Male' : 'Female';
+      const dobStr = `${fullYear}-${String(mm).padStart(2, '0')}-${String(dd).padStart(2, '0')}`;
+
+      return {
+        valid: true,
+        dob: dobStr,
+        age: age >= 0 ? age : 0,
+        gender,
+        reason: 'Valid SA ID'
+      };
+    }
+
+    /**
+     * Generates next sequential case number like MAN-0001, MAN-0002...
+     */
+    function getNextCaseNumber() {
+      let maxNum = 0;
+      for (const item of appState.helpdesk) {
+        const match = String(item.caseNumber || '').match(/(\d+)$/);
+        if (match) {
+          const val = parseInt(match[1], 10);
+          if (val > maxNum) maxNum = val;
+        }
+      }
+      return `MAN-${String(maxNum + 1).padStart(4, '0')}`;
+    }
+
+    /**
+     * =========================================================================
+     * LIVE AGGREGATIONS & WARD 1–51 MATRIX CALCULATIONS
+     * =========================================================================
+     */
+    function computeSystemMetrics() {
+      const branchFemale = appState.branch.filter((m) => parseSouthAfricanID(m.saId).gender === 'Female').length;
+      const branchMale = appState.branch.filter((m) => parseSouthAfricanID(m.saId).gender === 'Male').length;
+
+      const youthFemale = appState.youth.filter((m) => parseSouthAfricanID(m.saId).gender === 'Female').length;
+      const youthMale = appState.youth.filter((m) => parseSouthAfricanID(m.saId).gender === 'Male').length;
+
+      const womensFemale = appState.womens.filter((m) => parseSouthAfricanID(m.saId).gender === 'Female').length;
+      const womensMale = appState.womens.filter((m) => parseSouthAfricanID(m.saId).gender === 'Male').length;
+
+      const totalBranch = appState.branch.length;
+      const totalYouth = appState.youth.length;
+      const totalWomens = appState.womens.length;
+      const totalMembers = totalBranch + totalYouth + totalWomens;
+
+      const totalCases = appState.helpdesk.length;
+      const pendingCases = appState.helpdesk.filter((c) => c.status !== 'Resolved').length;
+      const resolvedCases = appState.helpdesk.filter((c) => c.status === 'Resolved').length;
+
+      const regionBreakdown = REGIONS.map((region) => {
+        const bCount = appState.branch.filter((x) => x.region === region).length;
+        const yCount = appState.youth.filter((x) => x.region === region).length;
+        const wCount = appState.womens.filter((x) => x.region === region).length;
+        const hCount = appState.helpdesk.filter((x) => x.region === region).length;
+        return {
+          region,
+          branch: bCount,
+          youth: yCount,
+          womens: wCount,
+          members: bCount + yCount + wCount,
+          helpdesk: hCount
+        };
+      });
+
+      const categoryBreakdown = HELP_DESK_CATEGORIES.map((cat) => {
+        const matches = appState.helpdesk.filter((c) => c.category === cat);
+        const resolved = matches.filter((c) => c.status === 'Resolved').length;
+        const open = matches.filter((c) => c.status !== 'Resolved').length;
+        return {
+          category: cat,
+          total: matches.length,
+          resolved,
+          open
+        };
+      });
+
+      const wardRows = WARDS.map((ward, index) => {
+        const wardNum = index + 1;
+        const meta = appState.wardMeta[ward] || {
+          region: getDefaultRegionForWard(wardNum),
+          coordinator: ''
+        };
+        const bCount = appState.branch.filter((x) => x.ward === ward).length;
+        const yCount = appState.youth.filter((x) => x.ward === ward).length;
+        const wCount = appState.womens.filter((x) => x.ward === ward).length;
+        const totalM = bCount + yCount + wCount;
+        const hCases = appState.helpdesk.filter((x) => x.ward === ward);
+        const hTotal = hCases.length;
+        const hResolved = hCases.filter((x) => x.status === 'Resolved').length;
+        const hPending = hCases.filter((x) => x.status !== 'Resolved').length;
+
+        return {
+          wardNum,
+          ward,
+          region: meta.region,
+          coordinator: meta.coordinator,
+          branchCount: bCount,
+          youthCount: yCount,
+          womensCount: wCount,
+          totalMembers: totalM,
+          helpdeskTotal: hTotal,
+          helpdeskResolved: hResolved,
+          helpdeskPending: hPending
+        };
+      });
+
+      return {
+        totalBranch,
+        totalYouth,
+        totalWomens,
+        totalMembers,
+        branchFemale,
+        branchMale,
+        youthFemale,
+        youthMale,
+        womensFemale,
+        womensMale,
+        totalFemale: branchFemale + youthFemale + womensFemale,
+        totalMale: branchMale + youthMale + womensMale,
+        totalCases,
+        pendingCases,
+        resolvedCases,
+        regionBreakdown,
+        categoryBreakdown,
+        wardRows
+      };
+    }
+
+    /**
+     * =========================================================================
+     * NAVIGATION, FEEDBACK & MODAL HELPERS
+     * =========================================================================
+     */
+    function navigateTo(viewName) {
+      appState.currentView = viewName;
+      saveState();
+      renderApp();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function showFeedback(message, type = 'success') {
+      const banner = document.getElementById('feedbackBanner');
+      const inner = document.getElementById('feedbackInner');
+      const text = document.getElementById('feedbackText');
+      if (!banner || !inner || !text) return;
+
+      text.textContent = message;
+      inner.className =
+        'rounded-xl px-4 py-3 text-xs sm:text-sm font-semibold flex items-center justify-between gap-3 border shadow-sm ' +
+        (type === 'error'
+          ? 'bg-red-50 text-red-900 border-red-300'
+          : 'bg-asaGreenLight text-black border-asaGreen');
+      banner.classList.remove('hidden');
+    }
+
+    function hideFeedback() {
+      const banner = document.getElementById('feedbackBanner');
+      if (banner) banner.classList.add('hidden');
+    }
+
+    function confirmClearAllData() {
+      const modal = document.getElementById('confirmModal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeConfirmModal() {
+      const modal = document.getElementById('confirmModal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function executeClearAllData() {
+      appState = createEmptyState();
+      saveState();
+      closeConfirmModal();
+      renderApp();
+      showFeedback('All records cleared. You can now add fresh Ward 1–51 entries or click "Sample Data".');
+    }
+
+    function loadSampleData() {
+      const currentView = appState.currentView;
+      appState = createSampleState();
+      appState.currentView = currentView;
+      saveState();
+      renderApp();
+      showFeedback('Sample Mangaung Metro (Wards 1–51) records loaded across all registers and Help Desk.');
+    }
+
+    /**
+     * =========================================================================
+     * SHARED UI COMPONENTS (BACK TO INDEX BAR, STATUS BADGES, SELECT HELPERS)
+     * =========================================================================
+     */
+    function renderBackToIndexBar(englishTitle, sesothoSubtitle) {
+      return `
+        <div class="bg-white border-2 border-black rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="inline-block w-2.5 h-2.5 rounded-full bg-asaGreen"></span>
+              <h1 class="text-lg sm:text-2xl font-black tracking-tight text-black">${escapeHtml(englishTitle)}</h1>
+            </div>
+            <p class="text-xs sm:text-sm text-gray-600 mt-0.5">${escapeHtml(sesothoSubtitle)}</p>
+          </div>
+          <button
+            type="button"
+            onclick="navigateTo('index')"
+            class="self-start sm:self-auto px-4 py-2.5 rounded-xl text-xs sm:text-sm font-extrabold bg-black hover:bg-neutral-800 text-white border-2 border-black hover:border-asaGreen transition flex items-center gap-2 cursor-pointer shrink-0"
+          >
+            <span>← Back to Index</span>
+          </button>
+        </div>
+      `;
+    }
+
+    function wardOptionsHtml(selectedWard = 'Ward 28', includeAll = false) {
+      let html = includeAll ? `<option value="ALL" ${selectedWard === 'ALL' ? 'selected' : ''}>All Wards (1–51)</option>` : '';
+      for (const w of WARDS) {
+        html += `<option value="${w}" ${selectedWard === w ? 'selected' : ''}>${w}</option>`;
+      }
+      return html;
+    }
+
+    function optionsHtml(list, selectedValue, includeAllLabel = null) {
+      let html = includeAllLabel ? `<option value="ALL" ${selectedValue === 'ALL' ? 'selected' : ''}>${escapeHtml(includeAllLabel)}</option>` : '';
+      for (const item of list) {
+        html += `<option value="${escapeHtml(item)}" ${selectedValue === item ? 'selected' : ''}>${escapeHtml(item)}</option>`;
+      }
+      return html;
+    }
+
+    function statusBadgeHtml(status) {
+      const s = String(status || '');
+      if (s === 'Active' || s === 'Resolved' || s === 'Called - Active' || s === 'Registered (IEC)') {
+        return `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-asaGreen text-white">${escapeHtml(s)}</span>`;
+      }
+      if (s === 'In Progress' || s === 'Pending Verification' || s === 'Follow-up Needed' || s === 'Needs Assistance' || s === 'Referred') {
+        return `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-asaGreenLight text-asaGreenDark border border-asaGreen/40">${escapeHtml(s)}</span>`;
+      }
+      return `<span class="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold bg-black text-white">${escapeHtml(s)}</span>`;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    /**
+     * =========================================================================
+     * VIEW 1: INDEX & LIVE DASHBOARD
+     * =========================================================================
+     */
+    function renderIndexDashboard() {
+      const m = computeSystemMetrics();
+      const maxCatTotal = Math.max(1, ...m.categoryBreakdown.map((c) => c.total));
+
+      const sectionCards = [
+        {
+          key: 'branch',
+          title: 'Branch Committee Register',
+          sesotho: 'Boetapele ba Branch & Ditho (Wards 1–51)',
+          countLabel: `${m.totalBranch} Members`,
+          linkText: 'Open Branch Committee →'
+        },
+        {
+          key: 'youth',
+          title: 'Youth League Register',
+          sesotho: 'Batjha ba ActionSA Mangaung (Wards 1–51)',
+          countLabel: `${m.totalYouth} Youth`,
+          linkText: 'Open Youth League →'
+        },
+        {
+          key: 'womens',
+          title: "Women's Committee Join & Volunteer",
+          sesotho: 'Tlatsa ho ba karolo ya Women’s Committee',
+          countLabel: `${m.totalWomens} Signups`,
+          linkText: "Open Women's Committee →"
+        },
+        {
+          key: 'helpdesk',
+          title: 'Help Desk — Ke Hloka Thuso',
+          sesotho: 'Metsi, Motlakase, SASSA, ID, GBV & Mosebetsi',
+          countLabel: `${m.totalCases} Cases`,
+          linkText: 'Open Help Desk →'
+        },
+        {
+          key: 'wards',
+          title: 'Ward 1–51 Summary Matrix',
+          sesotho: 'Kakaretso ya Di-Ward tse 51 tsa Mangaung',
+          countLabel: '51 Wards',
+          linkText: 'Open Ward 1–51 Matrix →'
+        }
+      ];
+
+      return `
+        <!-- Hero Banner -->
+        <section class="bg-black text-white rounded-2xl p-5 sm:p-7 border-b-4 border-asaGreen shadow-md">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div class="space-y-2 max-w-3xl">
+              <div class="inline-flex items-center gap-2 bg-asaGreen text-white text-xs font-extrabold uppercase tracking-wider px-3 py-1 rounded-full">
+                <span>Mangaung Metropolitan Municipality</span>
+                <span>•</span>
+                <span>Wards 1–51</span>
+              </div>
+              <h1 class="text-2xl sm:text-4xl font-black tracking-tight leading-tight">
+                ActionSA Mangaung Master Operations System
+              </h1>
+              <p class="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                Central register and service-delivery tracker for <strong>Branch Committee</strong>, <strong>Youth League</strong>, <strong>Women's Committee</strong>, and <strong>Help Desk (Ke Hloka Thuso)</strong> across all 51 wards in Bloemfontein, Botshabelo, Thaba Nchu, and surrounding areas.
+              </p>
+            </div>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3 gap-3 shrink-0">
+              <div class="bg-white text-black rounded-xl p-4 border-l-4 border-asaGreen min-w-[155px]">
+                <div class="text-[11px] font-bold uppercase text-gray-500">Total Members</div>
+                <div class="text-2xl sm:text-3xl font-black text-black mt-1">${m.totalMembers}</div>
+                <div class="text-[11px] font-semibold text-asaGreenDark mt-1">Ditho Tsohle (Wards 1–51)</div>
+              </div>
+              <div class="bg-white text-black rounded-xl p-4 border-l-4 border-black min-w-[155px]">
+                <div class="text-[11px] font-bold uppercase text-gray-500">Help Desk Cases</div>
+                <div class="text-2xl sm:text-3xl font-black text-black mt-1">${m.totalCases}</div>
+                <div class="text-[11px] font-semibold text-gray-600 mt-1">${m.resolvedCases} Resolved</div>
+              </div>
+              <div class="bg-asaGreen text-white rounded-xl p-4 border-l-4 border-white min-w-[155px]">
+                <div class="text-[11px] font-bold uppercase text-emerald-100">Pending Cases</div>
+                <div class="text-2xl sm:text-3xl font-black text-white mt-1">${m.pendingCases}</div>
+                <div class="text-[11px] font-semibold text-emerald-100 mt-1">Di Hloka Tlhokomelo</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Clickable Index Navigation Cards -->
+        <section aria-label="System Index">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-base sm:text-xl font-black text-black">
+              1. Master Index — Click Any Section to Open
+            </h2>
+            <span class="text-xs font-bold text-asaGreenDark">5 Active Modules</span>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            ${sectionCards
+              .map(
+                (card, idx) => `
+              <div class="bg-white rounded-2xl border-2 border-black hover:border-asaGreen p-5 shadow-sm flex flex-col justify-between transition group">
+                <div>
+                  <div class="flex items-center justify-between gap-2 mb-2">
+                    <span class="text-xs font-black px-2.5 py-0.5 rounded-md bg-black text-white">0${idx + 1}</span>
+                    <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-asaGreenLight text-asaGreenDark border border-asaGreen/30">
+                      ${escapeHtml(card.countLabel)}
+                    </span>
+                  </div>
+                  <h3 class="text-base sm:text-lg font-extrabold text-black group-hover:text-asaGreenDark transition">
+                    ${escapeHtml(card.title)}
+                  </h3>
+                  <p class="text-xs text-gray-600 mt-1">${escapeHtml(card.sesotho)}</p>
+                </div>
+                <button
+                  type="button"
+                  onclick="navigateTo('${card.key}')"
+                  class="mt-4 w-full py-2.5 px-4 rounded-xl bg-black group-hover:bg-asaGreen text-white text-xs sm:text-sm font-extrabold transition flex items-center justify-between cursor-pointer"
+                >
+                  <span>${escapeHtml(card.linkText)}</span>
+                  <span>→</span>
+                </button>
+              </div>
+            `
+              )
+              .join('')}
+          </div>
+        </section>
+
+        <!-- Structure Summary & Regional Breakdown -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Structure Breakdown -->
+          <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-base sm:text-lg font-black text-black">2. Structure Summary (Gender &amp; Totals)</h2>
+              <span class="text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-black text-white">Auto-Parsed ID</span>
+            </div>
+            <div class="overflow-x-auto table-scroll">
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="bg-black text-white">
+                    <th class="py-2.5 px-3 rounded-tl-lg">Structure</th>
+                    <th class="py-2.5 px-3 text-right">Female</th>
+                    <th class="py-2.5 px-3 text-right">Male</th>
+                    <th class="py-2.5 px-3 text-right bg-asaGreen rounded-tr-lg">Total</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  <tr>
+                    <td class="py-2.5 px-3 font-bold">
+                      <button type="button" onclick="navigateTo('branch')" class="text-asaGreenDark hover:underline text-left cursor-pointer">
+                        Branch Committee
+                      </button>
+                    </td>
+                    <td class="py-2.5 px-3 text-right font-semibold">${m.branchFemale}</td>
+                    <td class="py-2.5 px-3 text-right font-semibold">${m.branchMale}</td>
+                    <td class="py-2.5 px-3 text-right font-black">${m.totalBranch}</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-3 font-bold">
+                      <button type="button" onclick="navigateTo('youth')" class="text-asaGreenDark hover:underline text-left cursor-pointer">
+                        Youth League
+                      </button>
+                    </td>
+                    <td class="py-2.5 px-3 text-right font-semibold">${m.youthFemale}</td>
+                    <td class="py-2.5 px-3 text-right font-semibold">${m.youthMale}</td>
+                    <td class="py-2.5 px-3 text-right font-black">${m.totalYouth}</td>
+                  </tr>
+                  <tr>
+                    <td class="py-2.5 px-3 font-bold">
+                      <button type="button" onclick="navigateTo('womens')" class="text-asaGreenDark hover:underline text-left cursor-pointer">
+                        Women's Committee
+                      </button>
+                    </td>
+                    <td class="py-2.5 px-3 text-right font-semibold">${m.womensFemale}</td>
+                    <td class="py-2.5 px-3 text-right font-semibold">${m.womensMale}</td>
+                    <td class="py-2.5 px-3 text-right font-black">${m.totalWomens}</td>
+                  </tr>
+                  <tr class="bg-asaGreenLight font-black text-black border-t-2 border-black">
+                    <td class="py-2.5 px-3">Grand Total Members</td>
+                    <td class="py-2.5 px-3 text-right">${m.totalFemale}</td>
+                    <td class="py-2.5 px-3 text-right">${m.totalMale}</td>
+                    <td class="py-2.5 px-3 text-right text-asaGreenDark">${m.totalMembers}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Regional Breakdown -->
+          <div class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+            <div class="flex items-center justify-between mb-3">
+              <h2 class="text-base sm:text-lg font-black text-black">3. Regional Breakdown (Mangaung Areas)</h2>
+              <button type="button" onclick="navigateTo('wards')" class="text-xs font-extrabold text-asaGreenDark hover:underline cursor-pointer">
+                View All 51 Wards →
+              </button>
+            </div>
+            <div class="overflow-x-auto table-scroll">
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="bg-asaGreen text-white">
+                    <th class="py-2.5 px-3 rounded-tl-lg">Area / Sebaka</th>
+                    <th class="py-2.5 px-3 text-right">Branch</th>
+                    <th class="py-2.5 px-3 text-right">Youth</th>
+                    <th class="py-2.5 px-3 text-right">Women</th>
+                    <th class="py-2.5 px-3 text-right bg-black rounded-tr-lg">Help Desk</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  ${m.regionBreakdown
+                    .map(
+                      (r) => `
+                    <tr>
+                      <td class="py-2.5 px-3 font-bold text-black">${escapeHtml(r.region)}</td>
+                      <td class="py-2.5 px-3 text-right">${r.branch}</td>
+                      <td class="py-2.5 px-3 text-right">${r.youth}</td>
+                      <td class="py-2.5 px-3 text-right">${r.womens}</td>
+                      <td class="py-2.5 px-3 text-right font-extrabold text-asaGreenDark">${r.helpdesk}</td>
+                    </tr>
+                  `
+                    )
+                    .join('')}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- Help Desk Categories & Live Visual Bar Breakdown -->
+        <section class="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+            <div>
+              <h2 class="text-base sm:text-xl font-black text-black">
+                4. Help Desk ("Ke Hloka Thuso") — Category Breakdown &amp; Live Chart
+              </h2>
+              <p class="text-xs text-gray-600">
+                Metsi, Motlakase, SASSA / Grant, ID / Birth Certificate, GBV / Tlhekefetso, Mosebetsi / CV &amp; E nngwe
+              </p>
+            </div>
+            <button
+              type="button"
+              onclick="navigateTo('helpdesk')"
+              class="self-start sm:self-auto px-3.5 py-2 rounded-lg bg-asaGreen hover:bg-asaGreenDark text-white text-xs font-extrabold transition cursor-pointer"
+            >
+              Manage Help Desk Cases →
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+            <!-- Category Table -->
+            <div class="overflow-x-auto table-scroll">
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="bg-black text-white">
+                    <th class="py-2.5 px-3 rounded-tl-lg">Issue Category</th>
+                    <th class="py-2.5 px-3 text-right">Pending</th>
+                    <th class="py-2.5 px-3 text-right">Resolved</th>
+                    <th class="py-2.5 px-3 text-right bg-asaGreen rounded-tr-lg">Total</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                  ${m.categoryBreakdown
+                    .map(
+                      (c) => `
+                    <tr>
+                      <td class="py-2.5 px-3 font-bold text-black">${escapeHtml(c.category)}</td>
+                      <td class="py-2.5 px-3 text-right font-semibold text-gray-800">${c.open}</td>
+                      <td class="py-2.5 px-3 text-right font-bold text-asaGreenDark">${c.resolved}</td>
+                      <td class="py-2.5 px-3 text-right font-black text-black">${c.total}</td>
+                    </tr>
+                  `
+                    )
+                    .join('')}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Live Horizontal Bar Breakdown -->
+            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3">
+              <div class="flex items-center justify-between text-xs font-bold text-gray-700">
+                <span>Live Case Volume by Category</span>
+                <span class="text-asaGreenDark">Total: ${m.totalCases}</span>
+              </div>
+              ${m.categoryBreakdown
+                .map((c) => {
+                  const pct = Math.round((c.total / maxCatTotal) * 100);
+                  return `
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-xs">
+                      <span class="font-bold text-black">${escapeHtml(c.category)}</span>
+                      <span class="font-extrabold text-gray-800">${c.total} (${c.resolved} resolved)</span>
+                    </div>
+                    <div class="w-full h-3.5 bg-gray-200 rounded-full overflow-hidden border border-gray-300">
+                      <div
+                        class="h-full bg-asaGreen transition-all duration-300"
+                        style="width: ${pct}%"
+                      ></div>
+                    </div>
+                  </div>
+                `;
+                })
+                .join('')}
+            </div>
+          </div>
+        </section>
+      `;
+    }
+
+    /**
+     * =========================================================================
+     * SHARED MEMBER FORM & TABLE RENDERER (BRANCH, YOUTH, WOMENS)
+     * =========================================================================
+     */
+    function renderMemberRegisterView(config) {
+      const {
+        viewKey,
+        title,
+        sesothoSubtitle,
+        list,
+        editingId,
+        roleLabel,
+        roleOptions,
+        searchVal,
+        wardFilter,
+        statusFilter,
+        statusOptions,
+        isWomens
+      } = config;
+
+      const editingRecord = editingId ? list.find((item) => item.id === editingId) : null;
+      const initialId = editingRecord ? editingRecord.saId : '';
+      const parsedPreview = parseSouthAfricanID(initialId);
+
+      const filteredList = list.filter((item) => {
+        const q = String(searchVal || '').trim().toLowerCase();
+        const matchesSearch =
+          !q ||
+          String(item.fullName || '').toLowerCase().includes(q) ||
+          String(item.saId || '').toLowerCase().includes(q) ||
+          String(item.phone || '').toLowerCase().includes(q) ||
+          String(item.address || '').toLowerCase().includes(q);
+        const matchesWard = wardFilter === 'ALL' || item.ward === wardFilter;
+        const currentStatus = isWomens ? item.followupStatus : item.status;
+        const matchesStatus = statusFilter === 'ALL' || currentStatus === statusFilter;
+        return matchesSearch && matchesWard && matchesStatus;
+      });
+
+      const selectedVolunteerSet = new Set(editingRecord?.volunteerAreas || []);
+
+      return `
+        ${renderBackToIndexBar(title, sesothoSubtitle)}
+
+        <!-- Add / Edit Form Card -->
+        <section class="bg-white rounded-2xl border-2 border-black p-5 sm:p-6 shadow-sm">
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-gray-200">
+            <div>
+              <h2 class="text-base sm:text-xl font-black text-black">
+                ${editingRecord ? `Edit Record (${escapeHtml(editingRecord.id)})` : 'Add New Record / Kenya Motho e Motjha'}
+              </h2>
+              <p class="text-xs text-gray-600 mt-0.5">
+                13-digit SA ID automatically calculates Date of Birth, Age, and Gender (Female / Male).
+              </p>
+            </div>
+            ${
+              editingRecord
+                ? `<button type="button" onclick="cancelEdit('${viewKey}')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-200 hover:bg-gray-300 text-black cursor-pointer">Cancel Edit</button>`
+                : ''
+            }
+          </div>
+
+          <form onsubmit="handleMemberSubmit(event, '${viewKey}')" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <!-- Full Name -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">
+                  Lebitso le Fane (Full Name) *
+                </label>
+                <input
+                  type="text"
+                  name="fullName"
+                  required
+                  value="${escapeHtml(editingRecord?.fullName || '')}"
+                  placeholder="e.g. Lerato Molefe"
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen focus:ring-2 focus:ring-asaGreen/20 px-3.5 py-2.5 text-sm outline-none"
+                />
+              </div>
+
+              <!-- 13-Digit SA ID -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">
+                  Nomoro ya ID (13-Digit SA ID) *
+                </label>
+                <input
+                  id="saIdInput_${viewKey}"
+                  type="text"
+                  name="saId"
+                  maxlength="13"
+                  required
+                  value="${escapeHtml(editingRecord?.saId || '')}"
+                  oninput="updateSaIdPreview('${viewKey}')"
+                  placeholder="e.g. 9001015009087"
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen focus:ring-2 focus:ring-asaGreen/20 px-3.5 py-2.5 text-sm font-mono outline-none"
+                />
+              </div>
+
+              <!-- Phone / WhatsApp -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">
+                  Nomoro ya Phone / WhatsApp *
+                </label>
+                <input
+                  type="text"
+                  name="phone"
+                  required
+                  value="${escapeHtml(editingRecord?.phone || '')}"
+                  placeholder="060 315 3439"
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen focus:ring-2 focus:ring-asaGreen/20 px-3.5 py-2.5 text-sm outline-none"
+                />
+              </div>
+
+              <!-- Ward 1-51 -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">
+                  Ward (1 to 51) *
+                </label>
+                <select
+                  name="ward"
+                  required
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen focus:ring-2 focus:ring-asaGreen/20 px-3.5 py-2.5 text-sm bg-white outline-none"
+                >
+                  ${wardOptionsHtml(editingRecord?.ward || 'Ward 28', false)}
+                </select>
+              </div>
+            </div>
+
+            <!-- Live Auto-Parsed SA ID Strip -->
+            <div id="saIdPreview_${viewKey}" class="bg-asaGreenLight border border-asaGreen/40 rounded-xl p-3 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div>
+                <span class="text-gray-600 block font-semibold">Date of Birth (Auto)</span>
+                <span data-field="dob" class="font-black text-black text-sm">${escapeHtml(parsedPreview.dob)}</span>
+              </div>
+              <div>
+                <span class="text-gray-600 block font-semibold">Age / Lilemo (Auto)</span>
+                <span data-field="age" class="font-black text-black text-sm">${escapeHtml(parsedPreview.age)}</span>
+              </div>
+              <div>
+                <span class="text-gray-600 block font-semibold">Gender (Auto)</span>
+                <span data-field="gender" class="font-black text-asaGreenDark text-sm">${escapeHtml(parsedPreview.gender)}</span>
+              </div>
+              <div>
+                <span class="text-gray-600 block font-semibold">ID Validation</span>
+                <span data-field="status" class="font-bold text-gray-800">${escapeHtml(parsedPreview.reason)}</span>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <!-- Area / Region -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">
+                  Area / Sebaka (Mangaung) *
+                </label>
+                <select
+                  name="region"
+                  required
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen focus:ring-2 focus:ring-asaGreen/20 px-3.5 py-2.5 text-sm bg-white outline-none"
+                >
+                  ${optionsHtml(REGIONS, editingRecord?.region || 'Botshabelo')}
+                </select>
+              </div>
+
+              <!-- Section / Street Address -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">
+                  Section / Street Address *
+                </label>
+                <input
+                  type="text"
+                  name="address"
+                  required
+                  value="${escapeHtml(editingRecord?.address || '')}"
+                  placeholder="Ward 28 / Section K"
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen focus:ring-2 focus:ring-asaGreen/20 px-3.5 py-2.5 text-sm outline-none"
+                />
+              </div>
+
+              ${
+                !isWomens
+                  ? `
+                <!-- Role -->
+                <div>
+                  <label class="block text-xs font-extrabold text-black mb-1">
+                    ${escapeHtml(roleLabel)} *
+                  </label>
+                  <select
+                    name="role"
+                    required
+                    class="w-full rounded-xl border border-gray-300 focus:border-asaGreen focus:ring-2 focus:ring-asaGreen/20 px-3.5 py-2.5 text-sm bg-white outline-none"
+                  >
+                    ${optionsHtml(roleOptions, editingRecord?.role || roleOptions[0])}
+                  </select>
+                </div>
+
+                <!-- IEC Status -->
+                <div>
+                  <label class="block text-xs font-extrabold text-black mb-1">
+                    IEC Voter Registration
+                  </label>
+                  <select
+                    name="iecStatus"
+                    class="w-full rounded-xl border border-gray-300 focus:border-asaGreen focus:ring-2 focus:ring-asaGreen/20 px-3.5 py-2.5 text-sm bg-white outline-none"
+                  >
+                    ${optionsHtml(IEC_STATUSES, editingRecord?.iecStatus || IEC_STATUSES[0])}
+                  </select>
+                </div>
+              `
+                  : `
+                <!-- Women's ID Status -->
+                <div>
+                  <label class="block text-xs font-extrabold text-black mb-1">
+                    O na le ID? (ID Status) *
+                  </label>
+                  <select
+                    name="idStatus"
+                    required
+                    class="w-full rounded-xl border border-gray-300 focus:border-asaGreen focus:ring-2 focus:ring-asaGreen/20 px-3.5 py-2.5 text-sm bg-white outline-none"
+                  >
+                    ${optionsHtml(WOMENS_ID_STATUSES, editingRecord?.idStatus || WOMENS_ID_STATUSES[0])}
+                  </select>
+                </div>
+
+                <!-- Follow-up Status -->
+                <div>
+                  <label class="block text-xs font-extrabold text-black mb-1">
+                    Follow-up Status *
+                  </label>
+                  <select
+                    name="followupStatus"
+                    required
+                    class="w-full rounded-xl border border-gray-300 focus:border-asaGreen focus:ring-2 focus:ring-asaGreen/20 px-3.5 py-2.5 text-sm bg-white outline-none"
+                  >
+                    ${optionsHtml(WOMENS_FOLLOWUP_STATUSES, editingRecord?.followupStatus || WOMENS_FOLLOWUP_STATUSES[0])}
+                  </select>
+                </div>
+              `
+              }
+            </div>
+
+            ${
+              !isWomens
+                ? `
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-extrabold text-black mb-1">
+                    Membership Status *
+                  </label>
+                  <select
+                    name="status"
+                    required
+                    class="w-full rounded-xl border border-gray-300 focus:border-asaGreen focus:ring-2 focus:ring-asaGreen/20 px-3.5 py-2.5 text-sm bg-white outline-none"
+                  >
+                    ${optionsHtml(MEMBER_STATUSES, editingRecord?.status || 'Active')}
+                  </select>
+                </div>
+              </div>
+            `
+                : `
+              <!-- Women's Committee Volunteer Focus ("O batla ho thusa ka eng?") -->
+              <div class="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                <label class="block text-xs font-extrabold text-black mb-2">
+                  O batla ho thusa ka eng? (Volunteer Focus — Select one or more) *
+                </label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+                  ${WOMENS_VOLUNTEER_OPTIONS.map((opt) => {
+                    const checked = selectedVolunteerSet.has(opt) ? 'checked' : '';
+                    return `
+                      <label class="flex items-center gap-2.5 bg-white border border-gray-200 hover:border-asaGreen rounded-lg px-3 py-2 text-xs sm:text-sm font-semibold text-black cursor-pointer">
+                        <input
+                          type="checkbox"
+                          name="volunteerAreas"
+                          value="${escapeHtml(opt)}"
+                          ${checked}
+                          class="w-4 h-4 accent-[#00874E] rounded cursor-pointer"
+                        />
+                        <span>${escapeHtml(opt)}</span>
+                      </label>
+                    `;
+                  }).join('')}
+                </div>
+              </div>
+            `
+            }
+
+            <div class="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="submit"
+                class="px-6 py-2.5 rounded-xl bg-asaGreen hover:bg-asaGreenDark text-white text-sm font-extrabold shadow-sm transition cursor-pointer"
+              >
+                ${editingRecord ? 'Update Record / Boloka Diphetogo' : 'Save to Register / Boloka'}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Search & Filter Bar -->
+        <section class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-base sm:text-lg font-black text-black">
+                Registered Entries (${filteredList.length} shown of ${list.length} total)
+              </h2>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5 w-full md:w-auto">
+              <input
+                type="text"
+                value="${escapeHtml(searchVal || '')}"
+                oninput="updateFilter('${viewKey}', 'search', this.value)"
+                placeholder="Search name, ID, phone..."
+                class="rounded-xl border border-gray-300 focus:border-asaGreen px-3 py-2 text-xs sm:text-sm outline-none"
+              />
+              <select
+                onchange="updateFilter('${viewKey}', 'ward', this.value)"
+                class="rounded-xl border border-gray-300 focus:border-asaGreen px-3 py-2 text-xs sm:text-sm bg-white outline-none"
+              >
+                ${wardOptionsHtml(wardFilter, true)}
+              </select>
+              <select
+                onchange="updateFilter('${viewKey}', 'status', this.value)"
+                class="rounded-xl border border-gray-300 focus:border-asaGreen px-3 py-2 text-xs sm:text-sm bg-white outline-none"
+              >
+                ${optionsHtml(statusOptions, statusFilter, 'All Statuses')}
+              </select>
+            </div>
+          </div>
+
+          <!-- Register Table -->
+          <div class="overflow-x-auto table-scroll">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-black text-white">
+                  <th class="py-3 px-3 rounded-tl-lg">#</th>
+                  <th class="py-3 px-3">Full Name</th>
+                  <th class="py-3 px-3">SA ID</th>
+                  <th class="py-3 px-3">DOB</th>
+                  <th class="py-3 px-3">Age</th>
+                  <th class="py-3 px-3">Gender</th>
+                  <th class="py-3 px-3">Phone / WhatsApp</th>
+                  <th class="py-3 px-3">Ward</th>
+                  <th class="py-3 px-3">Area</th>
+                  <th class="py-3 px-3">Section / Address</th>
+                  ${
+                    !isWomens
+                      ? `
+                    <th class="py-3 px-3">${escapeHtml(roleLabel)}</th>
+                    <th class="py-3 px-3">IEC</th>
+                  `
+                      : `
+                    <th class="py-3 px-3">O batla ho thusa ka eng?</th>
+                    <th class="py-3 px-3">O na le ID?</th>
+                  `
+                  }
+                  <th class="py-3 px-3 bg-asaGreen">Status</th>
+                  <th class="py-3 px-3 rounded-tr-lg text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                ${
+                  filteredList.length === 0
+                    ? `
+                  <tr>
+                    <td colspan="14" class="py-8 text-center text-gray-500 font-semibold">
+                      No matching records found. Add a record above or adjust your search/filter.
+                    </td>
+                  </tr>
+                `
+                    : filteredList
+                        .map((item, idx) => {
+                          const idInfo = parseSouthAfricanID(item.saId);
+                          const rowStatus = isWomens ? item.followupStatus : item.status;
+                          return `
+                          <tr class="hover:bg-asaGreenLight/40 transition">
+                            <td class="py-2.5 px-3 font-bold text-gray-500">${idx + 1}</td>
+                            <td class="py-2.5 px-3 font-extrabold text-black whitespace-nowrap">${escapeHtml(item.fullName)}</td>
+                            <td class="py-2.5 px-3 font-mono whitespace-nowrap">${escapeHtml(item.saId)}</td>
+                            <td class="py-2.5 px-3 whitespace-nowrap">${escapeHtml(idInfo.dob)}</td>
+                            <td class="py-2.5 px-3 font-bold">${escapeHtml(idInfo.age)}</td>
+                            <td class="py-2.5 px-3 font-semibold">${escapeHtml(idInfo.gender)}</td>
+                            <td class="py-2.5 px-3 whitespace-nowrap">${escapeHtml(item.phone)}</td>
+                            <td class="py-2.5 px-3 font-bold whitespace-nowrap">${escapeHtml(item.ward)}</td>
+                            <td class="py-2.5 px-3 whitespace-nowrap">${escapeHtml(item.region)}</td>
+                            <td class="py-2.5 px-3">${escapeHtml(item.address)}</td>
+                            ${
+                              !isWomens
+                                ? `
+                              <td class="py-2.5 px-3 font-semibold whitespace-nowrap">${escapeHtml(item.role)}</td>
+                              <td class="py-2.5 px-3 whitespace-nowrap">${escapeHtml(item.iecStatus || '—')}</td>
+                            `
+                                : `
+                              <td class="py-2.5 px-3 min-w-[180px]">
+                                ${escapeHtml((item.volunteerAreas || []).join(', '))}
+                              </td>
+                              <td class="py-2.5 px-3 whitespace-nowrap">${escapeHtml(item.idStatus || '—')}</td>
+                            `
+                            }
+                            <td class="py-2.5 px-3 whitespace-nowrap">${statusBadgeHtml(rowStatus)}</td>
+                            <td class="py-2.5 px-3 text-right whitespace-nowrap space-x-1">
+                              <button
+                                type="button"
+                                onclick="startEdit('${viewKey}', '${escapeHtml(item.id)}')"
+                                class="px-2.5 py-1 rounded-md bg-black hover:bg-neutral-800 text-white font-bold cursor-pointer"
+                              >
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                onclick="deleteRecord('${viewKey}', '${escapeHtml(item.id)}')"
+                                class="px-2.5 py-1 rounded-md bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold cursor-pointer"
+                              >
+                                Delete
+                              </button>
+                            </td>
+                          </tr>
+                        `;
+                        })
+                        .join('')
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      `;
+    }
+
+    function renderBranchView() {
+      const f = appState.filters;
+      return renderMemberRegisterView({
+        viewKey: 'branch',
+        title: 'Branch Committee Register (Wards 1–51)',
+        sesothoSubtitle: 'Boetapele ba Branch le Ditho — Mangaung Metropolitan Municipality',
+        list: appState.branch,
+        editingId: appState.editing.branchId,
+        roleLabel: 'Branch Role',
+        roleOptions: BRANCH_ROLES,
+        searchVal: f.branchSearch,
+        wardFilter: f.branchWard,
+        statusFilter: f.branchStatus,
+        statusOptions: MEMBER_STATUSES,
+        isWomens: false
+      });
+    }
+
+    function renderYouthView() {
+      const f = appState.filters;
+      return renderMemberRegisterView({
+        viewKey: 'youth',
+        title: 'Youth League Register (Wards 1–51)',
+        sesothoSubtitle: 'ActionSA Youth League — Batjha ba Mangaung Metro',
+        list: appState.youth,
+        editingId: appState.editing.youthId,
+        roleLabel: 'Youth Focus / Role',
+        roleOptions: YOUTH_ROLES,
+        searchVal: f.youthSearch,
+        wardFilter: f.youthWard,
+        statusFilter: f.youthStatus,
+        statusOptions: MEMBER_STATUSES,
+        isWomens: false
+      });
+    }
+
+    function renderWomensView() {
+      const f = appState.filters;
+      return renderMemberRegisterView({
+        viewKey: 'womens',
+        title: "Join ActionSA Women's Committee — Mangaung (Wards 1–51)",
+        sesothoSubtitle: 'Rea le amohela! Tlatsa dintlha tsa hao ho ba karolo ya Women’s Committee ya Mangaung.',
+        list: appState.womens,
+        editingId: appState.editing.womensId,
+        roleLabel: 'Volunteer Focus',
+        roleOptions: WOMENS_VOLUNTEER_OPTIONS,
+        searchVal: f.womensSearch,
+        wardFilter: f.womensWard,
+        statusFilter: f.womensFollowup,
+        statusOptions: WOMENS_FOLLOWUP_STATUSES,
+        isWomens: true
+      });
+    }
+
+    /**
+     * =========================================================================
+     * VIEW 5: HELP DESK ("KE HLOKA THUSO" — WARDS 1–51)
+     * =========================================================================
+     */
+    function renderHelpDeskView() {
+      const f = appState.filters;
+      const editingCase = appState.editing.helpdeskId
+        ? appState.helpdesk.find((c) => c.id === appState.editing.helpdeskId)
+        : null;
+
+      const nextCaseNo = editingCase ? editingCase.caseNumber : getNextCaseNumber();
+      const todayIso = new Date().toISOString().slice(0, 10);
+
+      const filteredCases = appState.helpdesk.filter((c) => {
+        const q = String(f.helpdeskSearch || '').trim().toLowerCase();
+        const matchesSearch =
+          !q ||
+          String(c.caseNumber || '').toLowerCase().includes(q) ||
+          String(c.fullName || '').toLowerCase().includes(q) ||
+          String(c.phone || '').toLowerCase().includes(q) ||
+          String(c.description || '').toLowerCase().includes(q) ||
+          String(c.assignedTo || '').toLowerCase().includes(q);
+        const matchesWard = f.helpdeskWard === 'ALL' || c.ward === f.helpdeskWard;
+        const matchesCat = f.helpdeskCategory === 'ALL' || c.category === f.helpdeskCategory;
+        const matchesStatus = f.helpdeskStatus === 'ALL' || c.status === f.helpdeskStatus;
+        return matchesSearch && matchesWard && matchesCat && matchesStatus;
+      });
+
+      return `
+        ${renderBackToIndexBar(
+          'Help Desk ("Ke Hloka Thuso" — Wards 1–51)',
+          'O na le bothata ba metsi, motlakase, SASSA, ID, GBV, kapa mosebetsi? Emergency ya GBV: SAPS 10111.'
+        )}
+
+        <!-- Help Desk Case Form -->
+        <section class="bg-white rounded-2xl border-2 border-black p-5 sm:p-6 shadow-sm">
+          <div class="flex flex-wrap items-center justify-between gap-2 pb-4 mb-5 border-b border-gray-200">
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-base sm:text-xl font-black text-black">
+                  ${editingCase ? `Update Case ${escapeHtml(editingCase.caseNumber)}` : 'Log New Help Desk Case'}
+                </h2>
+                <span class="px-2.5 py-0.5 rounded-md bg-black text-emerald-300 font-mono text-xs font-extrabold">
+                  ${escapeHtml(nextCaseNo)}
+                </span>
+              </div>
+              <p class="text-xs text-gray-600 mt-0.5">
+                Se tshabe, dintlha tsa hao di sireletsehile. Case numbers are generated automatically (MAN-0001...).
+              </p>
+            </div>
+            ${
+              editingCase
+                ? `<button type="button" onclick="cancelEdit('helpdesk')" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-200 hover:bg-gray-300 text-black cursor-pointer">Cancel Edit</button>`
+                : ''
+            }
+          </div>
+
+          <form onsubmit="handleHelpDeskSubmit(event)" class="space-y-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <!-- Case Number (Auto) -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">Case Number (Auto)</label>
+                <input
+                  type="text"
+                  name="caseNumber"
+                  readonly
+                  value="${escapeHtml(nextCaseNo)}"
+                  class="w-full rounded-xl border border-gray-200 bg-gray-100 px-3.5 py-2.5 text-sm font-mono font-bold text-black outline-none"
+                />
+              </div>
+
+              <!-- Date Logged -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">Date Logged *</label>
+                <input
+                  type="date"
+                  name="dateLogged"
+                  required
+                  value="${escapeHtml(editingCase?.dateLogged || todayIso)}"
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen px-3.5 py-2.5 text-sm outline-none"
+                />
+              </div>
+
+              <!-- Ward 1-51 -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">Ward (1 to 51) *</label>
+                <select
+                  name="ward"
+                  required
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen px-3.5 py-2.5 text-sm bg-white outline-none"
+                >
+                  ${wardOptionsHtml(editingCase?.ward || 'Ward 28', false)}
+                </select>
+              </div>
+
+              <!-- Full Name -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">Lebitso le Fane (Name) *</label>
+                <input
+                  type="text"
+                  name="fullName"
+                  required
+                  value="${escapeHtml(editingCase?.fullName || '')}"
+                  placeholder="Resident full name"
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen px-3.5 py-2.5 text-sm outline-none"
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <!-- Issue Category -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">
+                  O hloka thuso ka eng? (Category) *
+                </label>
+                <select
+                  name="category"
+                  required
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen px-3.5 py-2.5 text-sm bg-white outline-none"
+                >
+                  ${optionsHtml(HELP_DESK_CATEGORIES, editingCase?.category || HELP_DESK_CATEGORIES[0])}
+                </select>
+              </div>
+
+              <!-- Phone / WhatsApp -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">Nomoro ya Phone / WhatsApp *</label>
+                <input
+                  type="text"
+                  name="phone"
+                  required
+                  value="${escapeHtml(editingCase?.phone || '')}"
+                  placeholder="060 315 3439"
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen px-3.5 py-2.5 text-sm outline-none"
+                />
+              </div>
+
+              <!-- Area -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">Area / Sebaka *</label>
+                <select
+                  name="region"
+                  required
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen px-3.5 py-2.5 text-sm bg-white outline-none"
+                >
+                  ${optionsHtml(REGIONS, editingCase?.region || 'Botshabelo')}
+                </select>
+              </div>
+
+              <!-- Address / Section -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">Ward / Section / Address *</label>
+                <input
+                  type="text"
+                  name="address"
+                  required
+                  value="${escapeHtml(editingCase?.address || '')}"
+                  placeholder="e.g. Ward 28 / Section K"
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen px-3.5 py-2.5 text-sm outline-none"
+                />
+              </div>
+            </div>
+
+            <!-- Brief Issue Description -->
+            <div>
+              <label class="block text-xs font-extrabold text-black mb-1">
+                Re bolelle bothata ba hao ka bokgutshwane (Brief Issue Description) *
+              </label>
+              <textarea
+                name="description"
+                rows="2"
+                required
+                placeholder='Mohlala: "Ha re na metsi Section K matsatsi a 3"'
+                class="w-full rounded-xl border border-gray-300 focus:border-asaGreen px-3.5 py-2.5 text-sm outline-none"
+              >${escapeHtml(editingCase?.description || '')}</textarea>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <!-- Best Time to Call -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">
+                  Ke nako efe e ntle ho o letsetsa?
+                </label>
+                <select
+                  name="callTime"
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen px-3.5 py-2.5 text-sm bg-white outline-none"
+                >
+                  ${optionsHtml(CALL_TIMES, editingCase?.callTime || CALL_TIMES[0])}
+                </select>
+              </div>
+
+              <!-- Case Status -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">Case Status *</label>
+                <select
+                  name="status"
+                  required
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen px-3.5 py-2.5 text-sm bg-white outline-none"
+                >
+                  ${optionsHtml(CASE_STATUSES, editingCase?.status || 'New / Pending')}
+                </select>
+              </div>
+
+              <!-- Assigned Coordinator -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">Assigned Coordinator</label>
+                <input
+                  type="text"
+                  name="assignedTo"
+                  value="${escapeHtml(editingCase?.assignedTo || '')}"
+                  placeholder="Coordinator name"
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen px-3.5 py-2.5 text-sm outline-none"
+                />
+              </div>
+
+              <!-- Resolution Notes -->
+              <div>
+                <label class="block text-xs font-extrabold text-black mb-1">Resolution Notes</label>
+                <input
+                  type="text"
+                  name="notes"
+                  value="${escapeHtml(editingCase?.notes || '')}"
+                  placeholder="Action taken / follow-up notes"
+                  class="w-full rounded-xl border border-gray-300 focus:border-asaGreen px-3.5 py-2.5 text-sm outline-none"
+                />
+              </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="submit"
+                class="px-6 py-2.5 rounded-xl bg-asaGreen hover:bg-asaGreenDark text-white text-sm font-extrabold shadow-sm transition cursor-pointer"
+              >
+                ${editingCase ? 'Save Case Update' : 'Submit Help Desk Case'}
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Help Desk Filters & Case Log Table -->
+        <section class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm space-y-4">
+          <div class="flex flex-col xl:flex-row xl:items-center justify-between gap-3">
+            <h2 class="text-base sm:text-lg font-black text-black">
+              Help Desk Case Log (${filteredCases.length} shown of ${appState.helpdesk.length} total)
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+              <input
+                type="text"
+                value="${escapeHtml(f.helpdeskSearch || '')}"
+                oninput="updateFilter('helpdesk', 'search', this.value)"
+                placeholder="Search case #, name, issue..."
+                class="rounded-xl border border-gray-300 focus:border-asaGreen px-3 py-2 text-xs sm:text-sm outline-none"
+              />
+              <select
+                onchange="updateFilter('helpdesk', 'ward', this.value)"
+                class="rounded-xl border border-gray-300 focus:border-asaGreen px-3 py-2 text-xs sm:text-sm bg-white outline-none"
+              >
+                ${wardOptionsHtml(f.helpdeskWard, true)}
+              </select>
+              <select
+                onchange="updateFilter('helpdesk', 'category', this.value)"
+                class="rounded-xl border border-gray-300 focus:border-asaGreen px-3 py-2 text-xs sm:text-sm bg-white outline-none"
+              >
+                ${optionsHtml(HELP_DESK_CATEGORIES, f.helpdeskCategory, 'All Categories')}
+              </select>
+              <select
+                onchange="updateFilter('helpdesk', 'status', this.value)"
+                class="rounded-xl border border-gray-300 focus:border-asaGreen px-3 py-2 text-xs sm:text-sm bg-white outline-none"
+              >
+                ${optionsHtml(CASE_STATUSES, f.helpdeskStatus, 'All Case Statuses')}
+              </select>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto table-scroll">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-black text-white">
+                  <th class="py-3 px-3 rounded-tl-lg">Case #</th>
+                  <th class="py-3 px-3">Date</th>
+                  <th class="py-3 px-3">Ward</th>
+                  <th class="py-3 px-3">Resident Name</th>
+                  <th class="py-3 px-3">Category</th>
+                  <th class="py-3 px-3">Phone / WhatsApp</th>
+                  <th class="py-3 px-3">Area &amp; Address</th>
+                  <th class="py-3 px-3 min-w-[200px]">Issue Description</th>
+                  <th class="py-3 px-3">Best Call Time</th>
+                  <th class="py-3 px-3 bg-asaGreen">Status</th>
+                  <th class="py-3 px-3">Assigned</th>
+                  <th class="py-3 px-3">Notes</th>
+                  <th class="py-3 px-3 rounded-tr-lg text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                ${
+                  filteredCases.length === 0
+                    ? `
+                  <tr>
+                    <td colspan="13" class="py-8 text-center text-gray-500 font-semibold">
+                      No Help Desk cases match your current filter.
+                    </td>
+                  </tr>
+                `
+                    : filteredCases
+                        .map(
+                          (c) => `
+                    <tr class="hover:bg-asaGreenLight/40 transition">
+                      <td class="py-2.5 px-3 font-mono font-black text-black whitespace-nowrap">${escapeHtml(c.caseNumber)}</td>
+                      <td class="py-2.5 px-3 whitespace-nowrap">${escapeHtml(c.dateLogged)}</td>
+                      <td class="py-2.5 px-3 font-bold whitespace-nowrap">${escapeHtml(c.ward)}</td>
+                      <td class="py-2.5 px-3 font-extrabold text-black whitespace-nowrap">${escapeHtml(c.fullName)}</td>
+                      <td class="py-2.5 px-3 font-bold text-asaGreenDark whitespace-nowrap">${escapeHtml(c.category)}</td>
+                      <td class="py-2.5 px-3 whitespace-nowrap">${escapeHtml(c.phone)}</td>
+                      <td class="py-2.5 px-3">
+                        <div class="font-bold">${escapeHtml(c.region)}</div>
+                        <div class="text-gray-600">${escapeHtml(c.address)}</div>
+                      </td>
+                      <td class="py-2.5 px-3">${escapeHtml(c.description)}</td>
+                      <td class="py-2.5 px-3 whitespace-nowrap">${escapeHtml(c.callTime || '—')}</td>
+                      <td class="py-2.5 px-3 whitespace-nowrap">${statusBadgeHtml(c.status)}</td>
+                      <td class="py-2.5 px-3 whitespace-nowrap">${escapeHtml(c.assignedTo || '—')}</td>
+                      <td class="py-2.5 px-3">${escapeHtml(c.notes || '—')}</td>
+                      <td class="py-2.5 px-3 text-right whitespace-nowrap space-x-1">
+                        <button
+                          type="button"
+                          onclick="startEdit('helpdesk', '${escapeHtml(c.id)}')"
+                          class="px-2.5 py-1 rounded-md bg-black hover:bg-neutral-800 text-white font-bold cursor-pointer"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          type="button"
+                          onclick="deleteRecord('helpdesk', '${escapeHtml(c.id)}')"
+                          class="px-2.5 py-1 rounded-md bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 font-bold cursor-pointer"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  `
+                        )
+                        .join('')
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+      `;
+    }
+
+    /**
+     * =========================================================================
+     * VIEW 6: WARD 1–51 SUMMARY MATRIX
+     * =========================================================================
+     */
+    function renderWardMatrixView() {
+      const m = computeSystemMetrics();
+      const f = appState.filters;
+
+      const filteredWards = m.wardRows.filter((row) => {
+        const q = String(f.wardMatrixSearch || '').trim().toLowerCase();
+        const matchesSearch =
+          !q ||
+          row.ward.toLowerCase().includes(q) ||
+          row.region.toLowerCase().includes(q) ||
+          String(row.coordinator || '').toLowerCase().includes(q);
+        const matchesRegion = f.wardMatrixRegion === 'ALL' || row.region === f.wardMatrixRegion;
+        return matchesSearch && matchesRegion;
+      });
+
+      const grandTotals = m.wardRows.reduce(
+        (acc, r) => {
+          acc.branch += r.branchCount;
+          acc.youth += r.youthCount;
+          acc.womens += r.womensCount;
+          acc.members += r.totalMembers;
+          acc.hdTotal += r.helpdeskTotal;
+          acc.hdResolved += r.helpdeskResolved;
+          acc.hdPending += r.helpdeskPending;
+          return acc;
+        },
+        { branch: 0, youth: 0, womens: 0, members: 0, hdTotal: 0, hdResolved: 0, hdPending: 0 }
+      );
+
+      return `
+        ${renderBackToIndexBar(
+          'Ward 1–51 Summary Matrix (Mangaung Metro)',
+          'Editable Region / Sub-Council & Ward Coordinator with live rollups from Branch, Youth, Women’s Committee & Help Desk.'
+        )}
+
+        <section class="bg-white rounded-2xl border border-gray-200 p-4 sm:p-5 shadow-sm space-y-4">
+          <div class="flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div>
+              <h2 class="text-base sm:text-lg font-black text-black">
+                All 51 Wards Rollup (${filteredWards.length} shown)
+              </h2>
+              <p class="text-xs text-gray-600">
+                Changes to Region or Ward Coordinator save automatically to local storage.
+              </p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2.5">
+              <input
+                type="text"
+                value="${escapeHtml(f.wardMatrixSearch || '')}"
+                oninput="updateFilter('wardMatrix', 'search', this.value)"
+                placeholder="Filter Ward # or coordinator..."
+                class="rounded-xl border border-gray-300 focus:border-asaGreen px-3 py-2 text-xs sm:text-sm outline-none"
+              />
+              <select
+                onchange="updateFilter('wardMatrix', 'region', this.value)"
+                class="rounded-xl border border-gray-300 focus:border-asaGreen px-3 py-2 text-xs sm:text-sm bg-white outline-none"
+              >
+                ${optionsHtml(REGIONS, f.wardMatrixRegion, 'All Regions / Areas')}
+              </select>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto table-scroll">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-black text-white">
+                  <th class="py-3 px-3 rounded-tl-lg">Ward</th>
+                  <th class="py-3 px-3">Region / Area</th>
+                  <th class="py-3 px-3">Ward Coordinator</th>
+                  <th class="py-3 px-3 text-right">Branch</th>
+                  <th class="py-3 px-3 text-right">Youth</th>
+                  <th class="py-3 px-3 text-right">Women</th>
+                  <th class="py-3 px-3 text-right bg-asaGreen">Total Members</th>
+                  <th class="py-3 px-3 text-right">HD Cases</th>
+                  <th class="py-3 px-3 text-right">Resolved</th>
+                  <th class="py-3 px-3 text-right rounded-tr-lg">Pending</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                ${filteredWards
+                  .map(
+                    (r) => `
+                  <tr class="hover:bg-asaGreenLight/40 transition">
+                    <td class="py-2 px-3 font-black text-black whitespace-nowrap">${escapeHtml(r.ward)}</td>
+                    <td class="py-2 px-3">
+                      <select
+                        onchange="updateWardMeta('${escapeHtml(r.ward)}', 'region', this.value)"
+                        class="rounded-lg border border-gray-300 focus:border-asaGreen px-2 py-1 text-xs bg-white outline-none"
+                      >
+                        ${optionsHtml(REGIONS, r.region)}
+                      </select>
+                    </td>
+                    <td class="py-2 px-3">
+                      <input
+                        type="text"
+                        value="${escapeHtml(r.coordinator)}"
+                        onchange="updateWardMeta('${escapeHtml(r.ward)}', 'coordinator', this.value)"
+                        placeholder="Assign coordinator"
+                        class="w-44 rounded-lg border border-gray-300 focus:border-asaGreen px-2.5 py-1 text-xs outline-none"
+                      />
+                    </td>
+                    <td class="py-2 px-3 text-right font-semibold">${r.branchCount}</td>
+                    <td class="py-2 px-3 text-right font-semibold">${r.youthCount}</td>
+                    <td class="py-2 px-3 text-right font-semibold">${r.womensCount}</td>
+                    <td class="py-2 px-3 text-right font-black text-asaGreenDark bg-asaGreenLight/40">${r.totalMembers}</td>
+                    <td class="py-2 px-3 text-right font-bold">${r.helpdeskTotal}</td>
+                    <td class="py-2 px-3 text-right font-bold text-asaGreenDark">${r.helpdeskResolved}</td>
+                    <td class="py-2 px-3 text-right font-bold ${r.helpdeskPending > 0 ? 'text-black' : 'text-gray-400'}">${r.helpdeskPending}</td>
+                  </tr>
+                `
+                  )
+                  .join('')}
+              </tbody>
+              <tfoot>
+                <tr class="bg-black text-white font-black border-t-2 border-asaGreen">
+                  <td colspan="3" class="py-3 px-3 rounded-bl-lg">GRAND TOTAL (WARDS 1–51)</td>
+                  <td class="py-3 px-3 text-right">${grandTotals.branch}</td>
+                  <td class="py-3 px-3 text-right">${grandTotals.youth}</td>
+                  <td class="py-3 px-3 text-right">${grandTotals.womens}</td>
+                  <td class="py-3 px-3 text-right bg-asaGreen text-white">${grandTotals.members}</td>
+                  <td class="py-3 px-3 text-right">${grandTotals.hdTotal}</td>
+                  <td class="py-3 px-3 text-right text-emerald-300">${grandTotals.hdResolved}</td>
+                  <td class="py-3 px-3 text-right rounded-br-lg">${grandTotals.hdPending}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </section>
+      `;
+    }
+
+    /**
+     * =========================================================================
+     * FORM HANDLERS, CRUD OPERATIONS & FILTER UPDATES
+     * =========================================================================
+     */
+    function updateSaIdPreview(viewKey) {
+      const input = document.getElementById(`saIdInput_${viewKey}`);
+      const preview = document.getElementById(`saIdPreview_${viewKey}`);
+      if (!input || !preview) return;
+
+      const parsed = parseSouthAfricanID(input.value);
+      const dobEl = preview.querySelector('[data-field="dob"]');
+      const ageEl = preview.querySelector('[data-field="age"]');
+      const genderEl = preview.querySelector('[data-field="gender"]');
+      const statusEl = preview.querySelector('[data-field="status"]');
+
+      if (dobEl) dobEl.textContent = parsed.dob;
+      if (ageEl) ageEl.textContent = parsed.age;
+      if (genderEl) genderEl.textContent = parsed.gender;
+      if (statusEl) statusEl.textContent = parsed.reason;
+    }
+
+    function handleMemberSubmit(event, viewKey) {
+      event.preventDefault();
+      const form = event.target;
+      const fd = new FormData(form);
+
+      const fullName = String(fd.get('fullName') || '').trim();
+      const saId = String(fd.get('saId') || '').replace(/\D/g, '').trim();
+      const phone = String(fd.get('phone') || '').trim();
+      const ward = String(fd.get('ward') || 'Ward 28').trim();
+      const region = String(fd.get('region') || 'Botshabelo').trim();
+      const address = String(fd.get('address') || '').trim();
+
+      if (!fullName || !phone || !address) {
+        showFeedback('Please complete all required fields.', 'error');
+        return;
+      }
+
+      if (saId.length !== 13) {
+        showFeedback('Please enter a valid 13-digit South African ID number.', 'error');
+        return;
+      }
+
+      const editKey = `${viewKey}Id`;
+      const existingId = appState.editing[editKey];
+
+      if (viewKey === 'womens') {
+        const volunteerAreas = fd.getAll('volunteerAreas').map((v) => String(v));
+        if (volunteerAreas.length === 0) {
+          showFeedback('Please select at least one option under "O batla ho thusa ka eng?".', 'error');
+          return;
+        }
+        const record = {
+          id: existingId || `WM-${Date.now().toString().slice(-5)}`,
+          fullName,
+          saId,
+          phone,
+          ward,
+          region,
+          address,
+          volunteerAreas,
+          idStatus: String(fd.get('idStatus') || WOMENS_ID_STATUSES[0]),
+          followupStatus: String(fd.get('followupStatus') || WOMENS_FOLLOWUP_STATUSES[0])
+        };
+
+        if (existingId) {
+          appState.womens = appState.womens.map((x) => (x.id === existingId ? record : x));
+          appState.editing.womensId = null;
+          showFeedback(`Updated Women's Committee entry for ${fullName}.`);
+        } else {
+          appState.womens.unshift(record);
+          showFeedback(`Added ${fullName} to Women's Committee (${ward}).`);
+        }
+      } else {
+        const prefix = viewKey === 'branch' ? 'BR' : 'YT';
+        const record = {
+          id: existingId || `${prefix}-${Date.now().toString().slice(-5)}`,
+          fullName,
+          saId,
+          phone,
+          ward,
+          region,
+          address,
+          role: String(fd.get('role') || ''),
+          iecStatus: String(fd.get('iecStatus') || IEC_STATUSES[0]),
+          status: String(fd.get('status') || 'Active')
+        };
+
+        if (existingId) {
+          appState[viewKey] = appState[viewKey].map((x) => (x.id === existingId ? record : x));
+          appState.editing[editKey] = null;
+          showFeedback(`Updated ${fullName}'s record.`);
+        } else {
+          appState[viewKey].unshift(record);
+          showFeedback(`Added ${fullName} to ${viewKey === 'branch' ? 'Branch Committee' : 'Youth League'} (${ward}).`);
+        }
+      }
+
+      saveState();
+      renderApp();
+    }
+
+    function handleHelpDeskSubmit(event) {
+      event.preventDefault();
+      const form = event.target;
+      const fd = new FormData(form);
+
+      const fullName = String(fd.get('fullName') || '').trim();
+      const phone = String(fd.get('phone') || '').trim();
+      const address = String(fd.get('address') || '').trim();
+      const description = String(fd.get('description') || '').trim();
+
+      if (!fullName || !phone || !address || !description) {
+        showFeedback('Please fill in all required Help Desk fields.', 'error');
+        return;
+      }
+
+      const existingId = appState.editing.helpdeskId;
+      const existingCase = existingId ? appState.helpdesk.find((c) => c.id === existingId) : null;
+
+      const record = {
+        id: existingId || `HD-${Date.now().toString().slice(-5)}`,
+        caseNumber: existingCase ? existingCase.caseNumber : getNextCaseNumber(),
+        dateLogged: String(fd.get('dateLogged') || new Date().toISOString().slice(0, 10)),
+        ward: String(fd.get('ward') || 'Ward 28'),
+        region: String(fd.get('region') || 'Botshabelo'),
+        fullName,
+        category: String(fd.get('category') || HELP_DESK_CATEGORIES[0]),
+        phone,
+        address,
+        description,
+        callTime: String(fd.get('callTime') || CALL_TIMES[0]),
+        status: String(fd.get('status') || 'New / Pending'),
+        assignedTo: String(fd.get('assignedTo') || '').trim(),
+        notes: String(fd.get('notes') || '').trim()
+      };
+
+      if (existingId) {
+        appState.helpdesk = appState.helpdesk.map((c) => (c.id === existingId ? record : c));
+        appState.editing.helpdeskId = null;
+        showFeedback(`Updated Help Desk case ${record.caseNumber}.`);
+      } else {
+        appState.helpdesk.unshift(record);
+        showFeedback(`Logged new Help Desk case ${record.caseNumber} for ${fullName} (${record.ward}).`);
+      }
+
+      saveState();
+      renderApp();
+    }
+
+    function startEdit(viewKey, id) {
+      const editKey = `${viewKey}Id`;
+      appState.editing[editKey] = id;
+      saveState();
+      renderApp();
+      window.scrollTo({ top: 90, behavior: 'smooth' });
+    }
+
+    function cancelEdit(viewKey) {
+      const editKey = `${viewKey}Id`;
+      appState.editing[editKey] = null;
+      saveState();
+      renderApp();
+    }
+
+    function deleteRecord(viewKey, id) {
+      if (viewKey === 'helpdesk') {
+        appState.helpdesk = appState.helpdesk.filter((c) => c.id !== id);
+        if (appState.editing.helpdeskId === id) appState.editing.helpdeskId = null;
+      } else {
+        appState[viewKey] = appState[viewKey].filter((m) => m.id !== id);
+        const editKey = `${viewKey}Id`;
+        if (appState.editing[editKey] === id) appState.editing[editKey] = null;
+      }
+      saveState();
+      renderApp();
+      showFeedback('Record removed from register.');
+    }
+
+    function updateFilter(group, field, value) {
+      if (group === 'branch') {
+        if (field === 'search') appState.filters.branchSearch = value;
+        if (field === 'ward') appState.filters.branchWard = value;
+        if (field === 'status') appState.filters.branchStatus = value;
+      } else if (group === 'youth') {
+        if (field === 'search') appState.filters.youthSearch = value;
+        if (field === 'ward') appState.filters.youthWard = value;
+        if (field === 'status') appState.filters.youthStatus = value;
+      } else if (group === 'womens') {
+        if (field === 'search') appState.filters.womensSearch = value;
+        if (field === 'ward') appState.filters.womensWard = value;
+        if (field === 'status') appState.filters.womensFollowup = value;
+      } else if (group === 'helpdesk') {
+        if (field === 'search') appState.filters.helpdeskSearch = value;
+        if (field === 'ward') appState.filters.helpdeskWard = value;
+        if (field === 'category') appState.filters.helpdeskCategory = value;
+        if (field === 'status') appState.filters.helpdeskStatus = value;
+      } else if (group === 'wardMatrix') {
+        if (field === 'search') appState.filters.wardMatrixSearch = value;
+        if (field === 'region') appState.filters.wardMatrixRegion = value;
+      }
+      saveState();
+      renderApp();
+    }
+
+    function updateWardMeta(ward, field, value) {
+      if (!appState.wardMeta[ward]) {
+        const wNum = parseInt(ward.replace(/\D/g, ''), 10) || 1;
+        appState.wardMeta[ward] = { region: getDefaultRegionForWard(wNum), coordinator: '' };
+      }
+      appState.wardMeta[ward][field] = value;
+      saveState();
+      if (field === 'region') {
+        renderApp();
+      }
+    }
+
+    /**
+     * =========================================================================
+     * CSV EXPORT FOR CURRENT VIEW
+     * =========================================================================
+     */
+    function exportCurrentViewCSV() {
+      const view = appState.currentView;
+      let rows = [];
+      let filename = `ActionSA_Mangaung_${view}.csv`;
+
+      if (view === 'branch' || view === 'youth') {
+        const list = appState[view];
+        rows.push(['ID', 'Full Name', 'SA ID', 'DOB', 'Age', 'Gender', 'Phone', 'Ward', 'Area', 'Address', 'Role', 'IEC Status', 'Status']);
+        for (const m of list) {
+          const idInfo = parseSouthAfricanID(m.saId);
+          rows.push([m.id, m.fullName, m.saId, idInfo.dob, idInfo.age, idInfo.gender, m.phone, m.ward, m.region, m.address, m.role, m.iecStatus, m.status]);
+        }
+      } else if (view === 'womens') {
+        rows.push(['ID', 'Full Name', 'SA ID', 'DOB', 'Age', 'Gender', 'Phone', 'Ward', 'Area', 'Address', 'Volunteer Focus', 'ID Status', 'Follow-up Status']);
+        for (const m of appState.womens) {
+          const idInfo = parseSouthAfricanID(m.saId);
+          rows.push([m.id, m.fullName, m.saId, idInfo.dob, idInfo.age, idInfo.gender, m.phone, m.ward, m.region, m.address, (m.volunteerAreas || []).join('; '), m.idStatus, m.followupStatus]);
+        }
+      } else if (view === 'helpdesk') {
+        rows.push(['Case Number', 'Date Logged', 'Ward', 'Area', 'Full Name', 'Category', 'Phone', 'Address', 'Description', 'Best Call Time', 'Status', 'Assigned To', 'Notes']);
+        for (const c of appState.helpdesk) {
+          rows.push([c.caseNumber, c.dateLogged, c.ward, c.region, c.fullName, c.category, c.phone, c.address, c.description, c.callTime, c.status, c.assignedTo, c.notes]);
+        }
+      } else if (view === 'wards') {
+        const metrics = computeSystemMetrics();
+        rows.push(['Ward', 'Region', 'Ward Coordinator', 'Branch Members', 'Youth Members', 'Women Members', 'Total Members', 'Help Desk Cases', 'Resolved', 'Pending']);
+        for (const r of metrics.wardRows) {
+          rows.push([r.ward, r.region, r.coordinator, r.branchCount, r.youthCount, r.womensCount, r.totalMembers, r.helpdeskTotal, r.helpdeskResolved, r.helpdeskPending]);
+        }
+      } else {
+        // Dashboard / Index export: Ward 1-51 summary
+        const metrics = computeSystemMetrics();
+        filename = 'ActionSA_Mangaung_Wards_1_to_51_Summary.csv';
+        rows.push(['Ward', 'Region', 'Ward Coordinator', 'Branch Members', 'Youth Members', 'Women Members', 'Total Members', 'Help Desk Cases', 'Resolved', 'Pending']);
+        for (const r of metrics.wardRows) {
+          rows.push([r.ward, r.region, r.coordinator, r.branchCount, r.youthCount, r.womensCount, r.totalMembers, r.helpdeskTotal, r.helpdeskResolved, r.helpdeskPending]);
+        }
+      }
+
+      const csvContent = rows
+        .map((row) =>
+          row
+            .map((cell) => {
+              const s = String(cell ?? '').replace(/"/g, '""');
+              return `"${s}"`;
+            })
+            .join(',')
+        )
+        .join('\n');
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      showFeedback(`Exported ${filename}.`);
+    }
+
+    /**
+     * =========================================================================
+     * MAIN RENDER DISPATCHER
+     * =========================================================================
+     */
+    function syncNavActiveStates() {
+      document.querySelectorAll('.nav-pill').forEach((btn) => {
+        const isActive = btn.getAttribute('data-nav') === appState.currentView;
+        btn.className =
+          'nav-pill px-3.5 py-2 rounded-lg whitespace-nowrap transition cursor-pointer ' +
+          (isActive
+            ? 'bg-asaGreen text-white shadow-sm'
+            : 'bg-white/10 hover:bg-white/20 text-gray-200');
+      });
+    }
+
+    function renderApp() {
+      syncNavActiveStates();
+      const container = document.getElementById('appContainer');
+      if (!container) return;
+
+      switch (appState.currentView) {
+        case 'branch':
+          container.innerHTML = renderBranchView();
+          break;
+        case 'youth':
+          container.innerHTML = renderYouthView();
+          break;
+        case 'womens':
+          container.innerHTML = renderWomensView();
+          break;
+        case 'helpdesk':
+          container.innerHTML = renderHelpDeskView();
+          break;
+        case 'wards':
+          container.innerHTML = renderWardMatrixView();
+          break;
+        case 'index':
+        default:
+          container.innerHTML = renderIndexDashboard();
+          break;
+      }
+    }
+
+    // Initialize application on DOM load
+    document.addEventListener('DOMContentLoaded', () => {
+      renderApp();
+    });
+  </script>
+</body>
+</html>
+```
